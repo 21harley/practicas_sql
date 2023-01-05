@@ -1,0 +1,195 @@
+https://josejuansanchez.org/bd/ejercicios-consultas-sql/index.html
+
+Lista el nombre de los productos, el precio en euros y el precio en dólares estadounidenses (USD). Utiliza los siguientes alias para las columnas: nombre de producto, euros, dólares.
+SELECT nombre,precio,ROUND(precio*0.09,2) Euros,ROUND(precio*0.10,2) USD from producto;
+
+Lista los nombres y los precios de todos los productos de la tabla producto, convirtiendo los nombres a mayúscula.
+SELECT UPPER(nombre),precio from producto;
+SELECT LOWER(nombre),precio from producto;
+
+Lista el nombre de todos los fabricantes en una columna, y en otra columna obtenga en mayúsculas los dos primeros caracteres del nombre del fabricante.
+SELECT nombre,UPPER( SUBSTRING(nombre,1,2)) as fabricante from producto;
+
+Lista los nombres y los precios de todos los productos de la tabla producto, redondeando el valor del precio.
+SELECT nombre,precio,ROUND(precio) as Round, FLOOR(precio) as Floor, CEIL(precio) as Ceil from producto;
+
+SELECT nombre,precio,ROUND(precio) as Round, FLOOR(precio) as Floor, CEIL(precio) as Ceil, TRUNCATE(precio,1) as Trucate from producto;
+
+Lista los nombres y los precios de todos los productos de la tabla producto, truncando el valor del precio para mostrarlo sin ninguna cifra decimal.
+SELECT TRUNCATE(precio,0) as Trucate from producto;
+
+Lista el identificador de los fabricantes que tienen productos en la tabla producto.
+SELECT fabricante.nombre FROM `fabricante`  
+INNER JOIN producto on fabricante.id=producto.id_fabricante
+GROUP BY fabricante.nombre 
+ORDER BY fabricante.nombre;
+
+Lista los nombres de los productos ordenados en primer lugar por el nombre de forma ascendente y en segundo lugar por el precio de forma descendente.
+SELECT fabricante.nombre,producto.nombre,producto.precio FROM `fabricante`  
+INNER JOIN producto on fabricante.id=producto.id_fabricante
+GROUP BY fabricante.nombre 
+ORDER BY producto.precio DESC;
+
+Devuelve una lista con las 5 primeras filas de la tabla fabricante.
+SELECT * FROM fabricante WHERE id<6;
+
+Lista el nombre y el precio del producto más barato. (Utilice solamente las cláusulas ORDER BY y LIMIT)
+SELECT nombre,precio FROM producto ORDER by precio ASC LIMIT 1;
+SELECT nombre,precio FROM producto ORDER by precio DESC LIMIT 1;
+
+
+SELECT * FROM producto WHERE precio BETWEEN 80 and 300;
+SELECT * FROM producto WHERE precio>=80 and precio<=300;
+
+SELECT * FROM producto WHERE id_fabricante IN(1,5,6);
+SELECT * FROM producto WHERE id_fabricante=1 OR id_fabricante=5 OR id_fabricante=6;
+
+SELECT nombre,precio FROM producto WHERE nombre like '%s%';
+
+https://guru99.es/regular-expressions/
+http://manuales.guebs.com/mysql-5.0/regexp.html
+
+Lista los nombres de los fabricantes cuyo nombre sea de 4 caracteres.
+SELECT nombre from producto WHERE nombre LIKE '% ____ %';
+
+Devuelve una lista con el nombre del producto, precio y nombre de fabricante de todos los productos de la base de datos.
+SELECT producto.nombre,producto.precio, fabricante.nombre FROM producto INNER JOIN fabricante WHERE producto.id_fabricante=fabricante.id;
+
+Devuelve una lista con el nombre del producto, precio y nombre de fabricante de todos los productos de la base de datos. Ordene el resultado por el nombre del fabricante, por orden alfabético.
+SELECT producto.nombre,producto.precio,fabricante.nombre FROM producto 
+INNER JOIN fabricante WHERE producto.id_fabricante=fabricante.id
+ORDER BY fabricante.nombre;
+
+
+SELECT producto.id, producto.nombre, producto.precio, fabricante.id, fabricante.nombre FROM producto INNER JOIN fabricante WHERE producto.id_fabricante=fabricante.id and producto.id=(SELECT id FROM producto ORDER BY precio DESC LIMIT 1 );
+
+SELECT producto.id, producto.nombre, producto.precio, fabricante.id, fabricante.nombre FROM producto INNER JOIN fabricante WHERE producto.id_fabricante=fabricante.id and producto.id=(SELECT id FROM producto ORDER BY precio ASC LIMIT 1 );
+
+SELECT producto.id, producto.nombre, producto.precio, fabricante.id, fabricante.nombre FROM producto INNER JOIN fabricante WHERE producto.id_fabricante=fabricante.id and fabricante.nombre='Lenovo';
+
+SELECT producto.id, producto.nombre, producto.precio, fabricante.id, fabricante.nombre 
+FROM producto INNER JOIN fabricante 
+WHERE producto.id_fabricante=fabricante.id and fabricante.nombre='Crucial' and producto.precio>200;
+
+SELECT producto.id, producto.nombre, producto.precio, fabricante.id, fabricante.nombre FROM producto INNER JOIN fabricante WHERE producto.id_fabricante=fabricante.id and fabricante.nombre IN('Asus', 'Hewlett-Packardy' ,'Seagate');
+
+SELECT producto.id, producto.nombre, producto.precio, fabricante.id, fabricante.nombre FROM producto INNER JOIN fabricante WHERE producto.id_fabricante=fabricante.id and fabricante.nombre NOT IN('Asus', 'Hewlett-Packardy' ,'Seagate');
+
+SELECT producto.id, producto.nombre, producto.precio, fabricante.id, fabricante.nombre FROM producto INNER JOIN fabricante WHERE producto.id_fabricante=fabricante.id;
+
+Devuelve un listado con el nombre de producto, precio y nombre de fabricante, de todos los productos que tengan un precio mayor o igual a 180€. Ordene el resultado en primer lugar por el precio (en orden descendente) y en segundo lugar por el nombre (en orden ascendente)
+SELECT producto.id, producto.nombre, producto.precio, fabricante.id, fabricante.nombre 
+FROM producto INNER JOIN fabricante 
+WHERE producto.id_fabricante=fabricante.id and producto.precio>=180
+ORDER BY producto.precio DESC;
+
+Consultas multitabla (Composición externa)
+
+Devuelve un listado de todos los fabricantes que existen en la base de datos, junto con los productos que tiene cada uno de ellos. El listado deberá mostrar también aquellos fabricantes que no tienen productos asociados.
+SELECT fabricante.id, fabricante.nombre, producto.nombre 
+FROM fabricante LEFT JOIN producto ON producto.id_fabricante=fabricante.id;
+
+Devuelve un listado donde sólo aparezcan aquellos fabricantes que no tienen ningún producto asociado.
+SELECT fabricante.id, fabricante.nombre, producto.nombre FROM fabricante LEFT JOIN producto ON producto.id_fabricante=fabricante.id WHERE producto.nombre IS null;
+
+¿Pueden existir productos que no estén relacionados con un fabricante? Justifique su respuesta. R= Es una tabla relaciona si o si tiene que llevar un item que exista 
+en la otra tabla ya que la esta usando como clave forranea .
+
+SELECT count(*) as Total_Productos from fabricante;
+
+Calcula el número de valores distintos de identificador de fabricante aparecen en la tabla productos.
+SELECT COUNT( DISTINCT id_fabricante) as total_Fabricante from producto;
+
+SELECT AVG(precio) as Media_de_productos, SUM(precio) as Suma_Productos,COUNT(*) as Total_Productos from producto;
+
+SELECT MIN(precio) as Valor_Minimo from producto;
+
+SELECT MAX(precio) as Valor_Maximo from producto;
+
+
+SELECT count(*) as Total_Productos_Asus,AVG(producto.precio) Promedio_precio,MIN(producto.precio) as precio_min,Max(producto.precio) as precio_max,SUM(producto.precio) as total_precio_producto from producto INNER JOIN fabricante WHERE producto.id_fabricante =fabricante.id and fabricante.nombre='Asus';
+
+Muestra el número total de productos que tiene cada uno de los fabricantes. El listado también debe incluir los fabricantes que no tienen ningún producto. El resultado mostrará dos columnas, una con el nombre del fabricante y otra con el número de productos que tiene. Ordene el resultado descendentemente por el número de productos.
+SELECT fabricante.id,fabricante.nombre, count(producto.id) as Total_Productos from producto 
+RIGHT JOIN fabricante 
+ON producto.id_fabricante =fabricante.id GROUP BY fabricante.id;
+
+Muestra el precio máximo, precio mínimo y precio medio de los productos de cada uno de los fabricantes. El resultado mostrará el nombre del fabricante junto con los datos que se solicitan.
+SELECT fabricante.id,fabricante.nombre, 
+count(producto.id) as Total_Productos,
+AVG(producto.precio) Promedio_precio,
+MIN(producto.precio) as precio_min,
+Max(producto.precio) as precio_max,
+SUM(producto.precio) as total_precio_producto from producto 
+RIGHT JOIN fabricante 
+ON producto.id_fabricante =fabricante.id GROUP BY fabricante.id;
+
+SELECT fabricante.id,fabricante.nombre, count(producto.id) as Total_Productos, AVG(producto.precio) Promedio_precio, MIN(producto.precio) as precio_min, Max(producto.precio) as precio_max, SUM(producto.precio) as total_precio_producto from producto RIGHT JOIN fabricante ON producto.id_fabricante =fabricante.id WHERE producto.precio>=200 GROUP BY fabricante.id;
+
+SELECT COUNT(*) as Total_productos_mayor FROM producto WHERE precio>=200;
+
+SELECT COUNT(*) as Total_productos,fabricante.nombre FROM producto INNER JOIN fabricante on producto.id_fabricante=fabricante.id WHERE producto.precio>=180 GROUP by producto.id_fabricante;
+
+Lista los nombres de los fabricantes cuyos productos tienen un precio medio mayor o igual a 150€.
+SELECT fabricante.id,fabricante.nombre, 
+AVG(producto.precio) as promedio_producto 
+from producto INNER JOIN fabricante on producto.id_fabricante=fabricante.id 
+GROUP BY producto.id_fabricante 
+HAVING promedio_producto >=150;
+
+Devuelve un listado con los nombres de los fabricantes que tienen 2 o más productos.
+SELECT fabricante.id,fabricante.nombre, 
+COUNT(producto.precio) as total_productos 
+from producto INNER JOIN fabricante on producto.id_fabricante=fabricante.id 
+GROUP BY producto.id_fabricante
+HAVING total_productos >=2;
+
+Devuelve un listado con los nombres de los fabricantes y el número de productos que tiene cada uno con un precio superior o igual a 220 €. No es necesario mostrar el nombre de los fabricantes que no tienen productos que cumplan la condición.
+SELECT fabricante.id,fabricante.nombre, 
+COUNT(producto.precio) as total_productos 
+from producto INNER JOIN fabricante on producto.id_fabricante=fabricante.id
+WHERE producto.precio>=200
+GROUP BY producto.id_fabricante;
+
+
+Devuelve un listado con los nombres de los fabricantes y el número de productos que tiene cada uno con un precio superior o igual a 220 €. El listado debe mostrar el nombre de todos los fabricantes, es decir, si hay algún fabricante que no tiene productos con un precio superior o igual a 220€ deberá aparecer en el listado con un valor igual a 0 en el número de productos.
+SELECT fabricante.nombre,COUNT(producto.precio) as  Total_Productos FROM producto
+RIGHT JOIN fabricante on producto.id_fabricante=fabricante.id AND producto.precio>=220
+GROUP BY fabricante.id  
+ORDER BY `Total_Productos` DESC;
+
+Devuelve un listado con los nombres de los fabricantes donde la suma del precio de todos sus productos es superior a 1000 €.
+SELECT fabricante.nombre,SUM(producto.precio) as  Total_Costo_Precio FROM producto
+RIGHT JOIN fabricante on producto.id_fabricante=fabricante.id
+GROUP BY fabricante.id  
+HAVING Total_Costo_Precio>1000
+ORDER BY Total_Costo_Precio DESC;
+
+
+Devuelve un listado con el nombre del producto más caro que tiene cada fabricante. El resultado debe tener tres columnas: nombre del producto, precio y nombre del fabricante. El resultado tiene que estar ordenado alfabéticamente de menor a mayor por el nombre del fabricante.
+select f.nombre, max(p.precio), max(CASE WHEN p.precio = p.precio THEN p.nombre else null end)
+from producto p left join fabricante f  on p.id_fabricante = f.id 
+group by f.nombre order by f.nombre asc;
+
+
+Devuelve todos los productos del fabricante Lenovo. (Sin utilizar INNER JOIN).
+SELECT * FROM `producto` WHERE id_fabricante=(SELECT id FROM fabricante WHERE nombre='Lenovo');
+
+SELECT * FROM producto WHERE precio=(
+SELECT MAX(precio) FROM `producto` 
+WHERE id_fabricante=(SELECT id FROM fabricante WHERE nombre='Lenovo')
+);
+
+SELECT MAX(precio),nombre FROM `producto` WHERE id_fabricante=(SELECT id FROM fabricante WHERE nombre='Lenovo');
+
+SELECT MIN(precio),nombre FROM `producto` WHERE id_fabricante=(SELECT id FROM fabricante WHERE nombre='Hewlett-Packard');
+
+SELECT * FROM producto WHERE precio>=( SELECT MAX(precio) FROM `producto` WHERE id_fabricante=(SELECT id FROM fabricante WHERE nombre='Lenovo') );
+
+SELECT  *  FROM `producto` 
+WHERE id_fabricante=(
+    SELECT id FROM fabricante WHERE nombre='Asus'
+) and 
+precio>=(
+    SELECT AVG(precio) FROM `producto` where id_fabricante=(SELECT id FROM fabricante WHERE nombre='Asus')
+);
